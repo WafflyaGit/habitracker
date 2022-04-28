@@ -1,19 +1,23 @@
 <?php
 
-use Illuminate\Http\Request;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+try {
+    $router = app()->make('router');
+} catch (BindingResolutionException $e) {
+    $router = new Route();
+}
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+$router->namespace('Auth')->group(static function () use ($router) {
+    $router->post('/login', 'LoginController')->name('login');
+    $router->post('/register', 'RegisterController')->name('register');
+
+    $router->middleware('auth:api')->group(static function () use ($router) {
+        $router->get('/me', 'AuthController@me')->name('me');
+    });
+});
+
+$router->middleware('auth:api')->group(static function () use ($router) {
+    $router->resource('folders', 'FolderController');
 });

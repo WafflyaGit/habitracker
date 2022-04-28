@@ -13,6 +13,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+Route::get('something', function () {
+    return "hi";
+})->name('something');
+
+Route::get('/{catchall?}', function () {
+    return response()->view('index');
+})->where('catchall', '(.*)');
+
